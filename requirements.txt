@@ -1,0 +1,3 @@
+eko>=0.15
+numpy
+matplotlib
