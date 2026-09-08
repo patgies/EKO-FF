@@ -14,8 +14,8 @@ Usage:
 
 import numpy as np
 
-from dglap_ff import physics as ph
-from dglap_ff.evolve import evolve_kk
+import physics as ph
+from evolve import evolve_kk
 
 PT_VALUES = [3.0, 9.0]
 SCALE_FACTORS = [0.25, 0.5, 1.0, 2.0, 4.0]

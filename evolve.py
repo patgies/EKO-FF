@@ -1,9 +1,5 @@
 """eko-based time-like DGLAP evolution of the BCFY/Kniehl-Kramer -> D0
 fragmentation functions.
-
-Uses the standard nf=5 VFNS reading of alpha_s(MZ)=0.118 (real quark-mass
-thresholds), not the frozen-nf=4 setup used by the QCDNUM-based analysis
-this was ported from -- see README for why that distinction matters.
 """
 
 import pathlib
@@ -17,21 +13,22 @@ from eko.io.types import ReferenceRunning
 from eko.runner import managed
 from ekobox import apply
 
-from . import physics as ph
+import physics as ph
 
 ALPHAS_MZ = 0.118
 MZ = 91.1876
-MASSES = (ph.MC, 4.5, 173.0)
-"""mc, mb, mt (GeV) -- standard VFNS thresholds."""
+MASSES = (ph.MC, ph.MB_FF0, 173.0)
+"""mc, mb, mt (GeV) -- standard VFNS thresholds. mb = MB_FF0 = 5.0 GeV,
+matching hep-ph/0607306's own convention (mu0=mb=5 GeV is stated there as
+where modern PDF sets place the flavour threshold), and the native-QCDNUM
+port (KK_D0.cc), which uses the same value for both purposes."""
 
 DEFAULT_ZGRID = np.linspace(0.05, 1.0 - 1e-6, 200)
 
 
 class SeededFlavor:
     """lhapdf-like object seeding a single quark/antiquark pair (pid, -pid)
-    with the same z-shape D(z) at the operator's initial scale (i.e.
-    q = qbar, no valence asymmetry -- matches how these fragmentation
-    functions are conventionally seeded)."""
+    with the same z-shape D(z) at the operator's initial scale."""
 
     def __init__(self, pid, func):
         self.pid = pid
@@ -132,8 +129,7 @@ def evolve_bcfy(q_values, zgrid=None, n_integration_cores=4):
                + 0.39 * theta(mD/mDstar - z) * D_V_evolved(z * mDstar/mD, Q)
 
     P and V are evolved as two independent time-like DGLAP sets (both from
-    mu0=mc) and combined after evolution -- the D*->D0 decay is a hadron-level
-    effect, not part of the QCD evolution.
+    mu0=mc) and combined after evolution. 
 
     Returns (zgrid, {Q: D(z, Q) array}).
     """
