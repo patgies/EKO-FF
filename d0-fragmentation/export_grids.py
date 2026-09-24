@@ -1,6 +1,5 @@
  """Export EKO-evolved BCFY and Kniehl-Kramer (charm-only)
-
-Usage: python export_lhapdf.py
+Usage: python export_grids.py
 Writes ../../diffractive-D0-UPC/data/bcfy_eko/bcfy_eko_0000.dat and
        ../../diffractive-D0-UPC/data/kk_eko/kk_eko_0000.dat
 """
@@ -11,7 +10,7 @@ import time
 import numpy as np
 
 import evolve_d0 as evolve
-import physics as ph
+import parametrizations as ph
 
 OUT_ROOT = pathlib.Path("../../diffractive-D0-UPC/data")
 

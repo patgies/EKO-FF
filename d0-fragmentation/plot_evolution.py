@@ -11,7 +11,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-import physics as ph
+import parametrizations as ph
 from evolve_d0 import evolve_bcfy, evolve_kk
 
 PT_VALUES = [3.0, 9.0]

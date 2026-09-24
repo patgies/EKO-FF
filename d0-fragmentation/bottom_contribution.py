@@ -7,7 +7,7 @@ Usage:
 
 import numpy as np
 
-import physics as ph
+import parametrizations as ph
 from evolve_d0 import evolve_kk
 
 PT_VALUES = [3.0, 9.0]
