@@ -1,4 +1,4 @@
-# EDO DGLAP evolution of fragmentation functions
+# EKO DGLAP evolution of fragmentation functions
 
 Generic time-like DGLAP evolution (via [`eko`](https://github.com/NNPDF/eko))
 
