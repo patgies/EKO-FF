@@ -1,13 +1,6 @@
 """Quantify the bottom-quark channel's contribution to the Kniehl-Kramer
 D0 fragmentation function, at pT = 3 and 9 GeV.
 
-The original QCDNUM-based analysis (inclusive-D0-UPC) dropped this channel,
-reporting its evolved contribution as negligible (<1e-5 relative) and
-inconsistent with its own un-evolved input by ~5 orders of magnitude --
-symptoms of a bug in that channel's QCDNUM wiring rather than a real
-physics suppression. This script redoes the bottom-channel evolution with
-eko and reports its actual size, so that call can be checked independently.
-
 Usage:
     python bottom_contribution.py
 """
@@ -15,7 +8,7 @@ Usage:
 import numpy as np
 
 import physics as ph
-from evolve import evolve_kk
+from evolve_d0 import evolve_kk
 
 PT_VALUES = [3.0, 9.0]
 SCALE_FACTORS = [0.25, 0.5, 1.0, 2.0, 4.0]

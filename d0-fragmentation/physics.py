@@ -15,7 +15,7 @@ how the two channels are combined.
 import numpy as np
 
 R = 0.1
-"""Light-quark/meson mass ratio in the BCFY formulas (usual choice for D mesons)."""
+"""Light-quark/meson mass ratio in the BCFY formulas."""
 
 MD, MDSTAR = 1.8648, 2.0067
 """D0, D*0 masses (GeV)."""
@@ -23,7 +23,6 @@ MD, MDSTAR = 1.8648, 2.0067
 MASS_RATIO = MDSTAR / MD
 
 MC = 1.5
-"""Charm mass = BCFY & Kniehl-Kramer-charm starting scale mu0 (GeV)."""
 
 MB_FF0 = 5.0
 """Kniehl-Kramer bottom-fragmentation starting scale mu0 (GeV, hep-ph/0607306)."""

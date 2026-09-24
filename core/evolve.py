@@ -1,7 +1,3 @@
-"""eko-based time-like DGLAP evolution of the BCFY/Kniehl-Kramer -> D0
-fragmentation functions.
-"""
-
 import pathlib
 import tempfile
 from math import nan
@@ -13,22 +9,15 @@ from eko.io.types import ReferenceRunning
 from eko.runner import managed
 from ekobox import apply
 
-import physics as ph
-
 ALPHAS_MZ = 0.118
 MZ = 91.1876
-MASSES = (ph.MC, ph.MB_FF0, 173.0)
-"""mc, mb, mt (GeV) -- standard VFNS thresholds. mb = MB_FF0 = 5.0 GeV,
-matching hep-ph/0607306's own convention (mu0=mb=5 GeV is stated there as
-where modern PDF sets place the flavour threshold), and the native-QCDNUM
-port (KK_D0.cc), which uses the same value for both purposes."""
+MASSES = (1.5, 5.0, 173.0)
+"""mc, mb, mt (GeV)"""
 
 DEFAULT_ZGRID = np.linspace(0.05, 1.0 - 1e-6, 200)
 
 
 class SeededFlavor:
-    """lhapdf-like object seeding a single quark/antiquark pair (pid, -pid)
-    with the same z-shape D(z) at the operator's initial scale."""
 
     def __init__(self, pid, func):
         self.pid = pid
@@ -42,8 +31,6 @@ class SeededFlavor:
 
 
 def nf_for_q(q, masses=MASSES):
-    """Number of active flavours at scale q (GeV), given u/d/s always
-    active and thresholds at `masses`."""
     nf = 3
     for m in masses:
         if q >= m:
@@ -98,13 +85,9 @@ def _build_cards(init_scale, mus, n_integration_cores, n_xgrid):
 def evolve_flavor(
     pid, ic_func, init_scale, q_values, zgrid=None, n_integration_cores=4, n_xgrid=100
 ):
-    """DGLAP-evolve a single quark-seeded fragmentation function `ic_func`
-    (seeded on flavour `pid`, at scale `init_scale`) up to each of
-    `q_values`.
-
+    """
     Returns (zgrid, {Q: D(z, Q) array}). Q values below `init_scale` are
-    clamped to it (the fragmentation function isn't defined below its own
-    starting scale).
+    clamped to it.
     """
     if zgrid is None:
         zgrid = DEFAULT_ZGRID
@@ -120,50 +103,3 @@ def evolve_flavor(
             )
 
     return zgrid, {q: pdfs[(q**2, nf_for_q(q))][pid] for q in q_values}
-
-
-def evolve_bcfy(q_values, zgrid=None, n_integration_cores=4):
-    """DGLAP-evolved BCFY D0 fragmentation function.
-
-    D_D0(z, Q) = 0.168 * D_P_evolved(z, Q)
-               + 0.39 * theta(mD/mDstar - z) * D_V_evolved(z * mDstar/mD, Q)
-
-    P and V are evolved as two independent time-like DGLAP sets (both from
-    mu0=mc) and combined after evolution. 
-
-    Returns (zgrid, {Q: D(z, Q) array}).
-    """
-    if zgrid is None:
-        zgrid = DEFAULT_ZGRID
-    z_scaled = ph.MASS_RATIO * zgrid
-    step = (ph.MD / ph.MDSTAR - zgrid) >= 0.0
-
-    _, dp = evolve_flavor(4, ph.bcfy_dp, ph.MC, q_values, zgrid, n_integration_cores)
-    _, dv = evolve_flavor(4, ph.bcfy_dv, ph.MC, q_values, z_scaled, n_integration_cores)
-
-    out = {q: 0.168 * dp[q] + np.where(step, 0.39 * dv[q], 0.0) for q in dp}
-    return zgrid, out
-
-
-def evolve_kk(q_values, zgrid=None, n_integration_cores=4):
-    """DGLAP-evolved Kniehl-Kramer D0 fragmentation function: charm channel
-    (from mu0=mc) plus bottom channel (from mu0=MB_FF0, only defined/evolved
-    for Q >= MB_FF0), summed linearly.
-
-    Returns (zgrid, total, parts) where parts = {"charm": {Q: D(z,Q)},
-    "bottom": {Q: D(z,Q)}} (bottom only has entries for Q >= MB_FF0).
-    """
-    if zgrid is None:
-        zgrid = DEFAULT_ZGRID
-
-    _, charm = evolve_flavor(4, ph.kk_charm_ic, ph.MC, q_values, zgrid, n_integration_cores)
-
-    bottom_qs = [q for q in q_values if q >= ph.MB_FF0]
-    bottom = {}
-    if bottom_qs:
-        _, bottom = evolve_flavor(
-            5, ph.kk_bottom_ic, ph.MB_FF0, bottom_qs, zgrid, n_integration_cores
-        )
-
-    total = {q: charm[q] + bottom.get(q, np.zeros_like(zgrid)) for q in charm}
-    return zgrid, total, {"charm": charm, "bottom": bottom}

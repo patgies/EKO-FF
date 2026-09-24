@@ -1,11 +1,5 @@
 """Plot the BCFY and Kniehl-Kramer D0 fragmentation functions, DGLAP-evolved
-to a few reference scales at pT = 3 and 9 GeV (matching the pT points used
-for the D0 spectrum in inclusive-D0-UPC).
-
-The eko evolution (one operator solve per model) is the expensive step, so
-results are cached to --cache after the first run; replotting (style
-tweaks, etc.) after that only re-reads the cache. Pass --recompute to force
-a fresh evolution.
+to a few reference scales at pT = 3 and 9 GeV
 
 Usage:
     python plot_evolution.py [--out ff_evolution.pdf] [--cache ff_evolution_data.npz]
@@ -18,7 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import physics as ph
-from evolve import evolve_bcfy, evolve_kk
+from evolve_d0 import evolve_bcfy, evolve_kk
 
 PT_VALUES = [3.0, 9.0]
 SCALE_FACTORS = [0.25, 0.5, 1.0, 2.0, 4.0]

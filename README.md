@@ -1,7 +1,9 @@
-# DGLAP evolution of charm/bottom → D0 fragmentation functions
+# eko-based DGLAP evolution of fragmentation functions
 
-Time-like DGLAP evolution (via [`eko`](https://github.com/NNPDF/eko)) of two
-charm-fragmentation models used for D0-meson production:
+Generic time-like DGLAP evolution (via [`eko`](https://github.com/NNPDF/eko))
+of analytically-parametrized fragmentation functions, plus one project's
+worth of physics built on top: charm/bottom → D0 fragmentation models used
+for D0-meson production.
 
 - **BCFY** — E. Braaten, K. Cheung, S. Fleming, T.C. Yuan,
   [Phys. Rev. D51 (1995) 4819](https://arxiv.org/abs/hep-ph/9409316):
@@ -18,19 +20,35 @@ with the LO time-like DGLAP equations.
 ## Layout
 
 ```
-physics.py   analytic fragmentation-function parametrizations
-evolve.py    eko driver: seeds a single flavour at its starting scale,
-             solves the time-like DGLAP evolution
-plot_evolution.py      pT=3/9 GeV evolution plots for BCFY and Kniehl-Kramer
-bottom_contribution.py quantifies the KK bottom channel vs. the charm channel
+core/
+  evolve.py    generic eko driver, no physics-specific content: seeds a
+               single flavour at its starting scale (evolve_flavor()) and
+               solves the time-like DGLAP evolution. Reusable as-is by any
+               future project -- import this unchanged, don't fork it.
+
+d0-fragmentation/   this project: charm/bottom -> D0 fragmentation
+  physics.py         analytic BCFY/KK parametrizations (D0/D* masses, etc.)
+  evolve_d0.py        D0-specific evolution: evolve_bcfy()/evolve_kk(),
+                       built on core/evolve.py's evolve_flavor()
+  export_lhapdf.py    writes eko-evolved BCFY/KK grids in LHAPDF lhagrid1
+                       format, for diffractive-D0-UPC's src/bcfy_grid.cpp /
+                       kk_grid.cpp to read (see that repo's README)
+  plot_evolution.py   pT=3/9 GeV evolution plots for BCFY and Kniehl-Kramer
+  bottom_contribution.py  quantifies the KK bottom channel vs. charm channel
+
+A future project (different physics, e.g. a different meson/parametrization)
+gets its own sibling folder next to d0-fragmentation/, importing the same
+unchanged core/evolve.py -- no risk of two projects' physics colliding.
 ```
 
 ## Usage
 
 ```bash
 pip install -r requirements.txt
-python plot_evolution.py             # writes ff_evolution.pdf
+cd d0-fragmentation
+python plot_evolution.py             # writes output/ff_evolution.pdf
 python bottom_contribution.py        # prints a table to stdout
+python export_lhapdf.py              # writes the LHAPDF grids diffractive-D0-UPC reads
 ```
 
 
